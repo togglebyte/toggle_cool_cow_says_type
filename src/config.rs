@@ -15,24 +15,33 @@ impl Config {
         let mut project_path = None;
         let mut file_extension = "rs".to_string();
 
+        let mut argc = 0;
+
         while let Some(arg) = args.next() {
-            if arg == "-w" {
-                word_count = args
-                    .next()
-                    .and_then(|s| s.parse::<usize>().ok())
-                    .unwrap_or(10);
-            }
-
-            if arg == "-t" {
-                file_extension = args.next().unwrap_or("rs".to_string());
-                if file_extension.starts_with('.') {
-                    file_extension.remove(0);
+            argc += 1;
+            match arg.to_lowercase().as_ref() {
+                "-h" | "-?" | "--h" | "--?" => return Err(Error::NeedsHelp),
+                "-w" => {
+                    word_count = args
+                        .next()
+                        .and_then(|s| s.parse::<usize>().ok())
+                        .unwrap_or(10);
                 }
+                "-t" => {
+                    file_extension = args.next().unwrap_or("rs".to_string());
+                    if file_extension.starts_with('.') {
+                        file_extension.remove(0);
+                    }
+                }
+                "-p" => {
+                    project_path = args.next();
+                }
+                _ => {}
             }
+        }
 
-            if arg == "-p" {
-                project_path = args.next();
-            }
+        if argc <= 1 {
+            return Err(Error::NeedsHelp);
         }
 
         let project_path = match project_path {
