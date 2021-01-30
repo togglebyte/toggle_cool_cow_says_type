@@ -15,9 +15,6 @@ impl Config {
         let mut project_path = None;
         let mut file_extension = "rs".to_string();
 
-        //let argv: Vec<String> = args.collect();
-        //if argv.len() <= 1 {};
-        //let mut args = argv.into_iter();
         let mut argc = 0;
 
         while let Some(arg) = args.next() {
