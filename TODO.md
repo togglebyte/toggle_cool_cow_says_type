@@ -16,7 +16,7 @@
 
 # Bugs and misc fixes
 
-* [ ] Comments only capture one word
+* [X] Comments only capture one word
 * [X] Store text chars on `GameState`
 * [X] Pressing esc quits the game
 * [X] Word count should never be zero
