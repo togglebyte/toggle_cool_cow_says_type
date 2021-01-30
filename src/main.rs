@@ -131,8 +131,15 @@ fn play() -> error::Result<()> {
 fn main() {
     match play() {
         Ok(()) => (),
+        Err(e) if e == error::Error::NeedsHelp => {
+            println!("{}", e.to_string());
+        }
         Err(e) => {
-            eprintln!("Error: {}", e.to_string());
+            eprintln!(
+                "{}\nError: {}",
+                error::Error::NeedsHelp.to_string(),
+                e.to_string()
+            );
             std::process::exit(1);
         }
     }
