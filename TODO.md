@@ -1,4 +1,8 @@
-# Tasks
+# To do
+
+* [ ] l
+
+# Main Tasks
 
 * [X] Game state
     * [X] Count mistakes

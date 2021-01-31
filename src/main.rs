@@ -13,32 +13,94 @@ use config::Config;
 use gamestate::{Game, GameState};
 use words::words;
 
+// -----------------------------------------------------------------------------
+//     - Render -
+// -----------------------------------------------------------------------------
 fn render(game: &Game, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTarget>) {
     match game.state {
         GameState::Running(_) => {
             let input = game.input();
-            let text = game.text_chars.iter().skip(input.len());
+            let text = &game.text_chars; //.iter().skip(input.len());
 
-            let mut x = (viewport.size.width - game.text.chars().count() as u16) / 2;
-            let y = viewport.size.height / 2;
-            for (c, correct) in input {
-                let color = match correct {
-                    true => Color::Blue,
-                    false => Color::Red,
-                };
-                viewport.draw_pixel(Pixel::new(c, ScreenPos::new(x, y), Some(color), None));
+            let char_count = game.text.chars().count() as u16;
+            let lines = char_count / viewport.size.width;
+
+            // Find the starting x value.
+            let mut x = if lines > 1 {
+                0
+            } else {
+                (viewport.size.width - game.text.chars().count() as u16) / 2
+            };
+
+            let mut y = viewport.size.height / 2 - lines / 2;
+
+            for i in 0..char_count as usize {
+                // An input character can either be:
+                // 1. Correct,
+                // 2. Incorrect space over non-space character
+                // 3. Incorrect character over space
+                // 4. Incorrect non-space character over non-space correct character
+                match input.get(i) {
+                    // Correct
+                    Some((c, _)) if *c == text[i] => viewport.draw_pixel(Pixel::new(
+                        text[i],
+                        ScreenPos::new(x, y),
+                        Some(Color::Blue),
+                        None,
+                    )),
+                    // Incorrect space over non-space character
+                    Some((' ', _)) if text[i] != ' ' => viewport.draw_pixel(Pixel::new(
+                        text[i],
+                        ScreenPos::new(x, y),
+                        Some(Color::DarkGrey),
+                        None,
+                    )),
+                    // Incorrect character over space
+                    Some((c, _)) if text[i] == ' ' => viewport.draw_pixel(Pixel::new(
+                        *c,
+                        ScreenPos::new(x, y),
+                        Some(Color::DarkYellow),
+                        None,
+                    )),
+                    Some((_, _)) => viewport.draw_pixel(Pixel::new(
+                        text[i],
+                        ScreenPos::new(x, y),
+                        Some(Color::Red),
+                        None,
+                    )),
+                    None => viewport.draw_pixel(Pixel::new(
+                        text[i],
+                        ScreenPos::new(x, y),
+                        Some(Color::White),
+                        None,
+                    )),
+                }
+
                 x += 1;
+                if x >= viewport.size.width {
+                    x = 0;
+                    y += 1;
+                }
             }
 
-            for c in text {
-                viewport.draw_pixel(Pixel::new(
-                    *c,
-                    ScreenPos::new(x, y),
-                    Some(Color::White),
-                    None,
-                ));
-                x += 1;
-            }
+            // for (c, correct) in input {
+            //     let color = match correct {
+            //         true => Color::Blue,
+            //         false => Color::Red,
+            //     };
+            //     viewport.draw_pixel(Pixel::new(c, ScreenPos::new(x, y), Some(color), None));
+            //     x += 1;
+            // }
+
+            // for c in text {
+            //     viewport.draw_pixel(Pixel::new(
+            //         *c,
+            //         ScreenPos::new(x, y),
+            //         Some(Color::White),
+            //         None,
+            //     ));
+            //     x += 1;
+            // }
         }
         GameState::Stopped => {
             let text = "Press any key to start";
@@ -74,6 +136,9 @@ fn render(game: &Game, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTa
     renderer.render(viewport);
 }
 
+// -----------------------------------------------------------------------------
+//     - Game loop -
+// -----------------------------------------------------------------------------
 fn play() -> error::Result<()> {
     let config = Config::from_args(args())?;
     let selected_words = words(&config)?;

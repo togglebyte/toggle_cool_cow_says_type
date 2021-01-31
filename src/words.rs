@@ -44,12 +44,6 @@ fn code_to_words(code: String) -> Vec<String> {
         .map(String::from)
         .collect::<Vec<_>>();
 
-    // let words = code
-    //     .split_whitespace()
-    //     .filter(|word| !word.starts_with("//"))
-    //     .map(String::from)
-    //     .collect::<Vec<_>>();
-
     words
 }
 
