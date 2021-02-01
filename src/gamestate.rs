@@ -20,10 +20,11 @@ pub struct Game {
     mistakes: usize,
     word_count: usize,
     pub state: GameState,
+    strict: bool,
 }
 
 impl Game {
-    pub fn new(words: Vec<String>) -> Self {
+    pub fn new(words: Vec<String>, strict: bool) -> Self {
         let word_count = words.len();
         let text = words.join(" ");
         let text_chars = text.chars().collect::<Vec<_>>();
@@ -35,6 +36,7 @@ impl Game {
             text_chars,
             mistakes: 0,
             state: GameState::Stopped,
+            strict,
         }
     }
 
@@ -91,7 +93,7 @@ impl Game {
             // including the space character itself
             self.input.push(' ');
             self.mistakes += 1;
-            if self.input.len() >= self.text.len() {
+            if !self.strict && self.input.len() >= self.text.len() {
                 self.finish();
             }
             return;
@@ -108,7 +110,7 @@ impl Game {
 
         // if we have mistyped and press space after the last word
         // quit the game
-        let should_quit = self.input.len() > self.text.len() + 1 && a.unwrap_or('.') == ' ';
+        let should_quit = !self.strict && next_index >= self.text.len() + 1 && a.unwrap_or('.') == ' ';
 
         if !should_quit && a != b {
             self.mistakes += 1;
@@ -117,6 +119,10 @@ impl Game {
         // if we input the text correctly or we press space after the last word
         if self.input == self.text || should_quit {
             self.finish();
+        }
+
+        if self.input.len() > self.text.len() {
+            self.input.pop();
         }
     }
 

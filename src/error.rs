@@ -18,7 +18,8 @@ impl Error {
             Error::ZeroWordCount => "Word count can not be zero".into(),
             Error::NeedsHelp => "Usage: toggle_cool_cow_says_type -t rs -w 5 path_to_project
     -t : extension of files to use for words. Defaults to rs for Rust.
-    -w : number of words to type against. Defaults to 10.".into(),
+    -w : number of words to type against. Defaults to 10.
+    -s : strict mode. Input must be matchedp perfectly, otherwise game can't end!".into(),
         }
     }
 }

@@ -143,7 +143,7 @@ fn play() -> error::Result<()> {
     let config = Config::from_args(args())?;
     let selected_words = words(&config)?;
 
-    let mut game = Game::new(selected_words);
+    let mut game = Game::new(selected_words, config.strict);
 
     let (w, h) = term_size().expect("could not get terminal size");
     let mut viewport = Viewport::new(ScreenPos::zero(), ScreenSize::new(w, h));
@@ -167,7 +167,7 @@ fn play() -> error::Result<()> {
                 GameState::Finished { .. } => {
                     if c == 'y' {
                         let selected_words = words(&config)?;
-                        game = Game::new(selected_words);
+                        game = Game::new(selected_words, config.strict);
                     } else if c == 'n' {
                         break;
                     }

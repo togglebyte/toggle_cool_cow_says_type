@@ -7,6 +7,7 @@ pub struct Config {
     pub project_path: PathBuf,
     pub file_extension: String,
     pub word_count: usize,
+    pub strict: bool,
 }
 
 impl Config {
@@ -16,6 +17,7 @@ impl Config {
         let mut file_extension = "rs".to_string();
 
         let mut argc = 0;
+        let mut strict = false;
 
         while let Some(arg) = args.next() {
             argc += 1;
@@ -32,6 +34,9 @@ impl Config {
                     if file_extension.starts_with('.') {
                         file_extension.remove(0);
                     }
+                }
+                "-s" => {
+                    strict = true;
                 }
                 arg => {
                     project_path = Some(arg.to_owned());
@@ -56,6 +61,7 @@ impl Config {
             word_count,
             project_path: project_path.into(),
             file_extension,
+            strict,
         };
 
         Ok(inst)
