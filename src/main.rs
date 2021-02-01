@@ -16,10 +16,11 @@ use words::words;
 // -----------------------------------------------------------------------------
 //     - Render -
 // -----------------------------------------------------------------------------
-fn render(game: &Game, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTarget>) {
+fn render(game: &Game, config: &Config, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTarget>) {
     match game.state {
         GameState::Running(_) => {
             let input = game.input();
+            let index = input.len();
             let text = &game.text_chars;
 
             let char_count = game.text.chars().count() as u16;
@@ -67,6 +68,12 @@ fn render(game: &Game, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTa
                         ScreenPos::new(x, y),
                         Some(Color::Red),
                         None,
+                    )),
+                    None if i == index => viewport.draw_pixel(Pixel::new(
+                        text[i],
+                        ScreenPos::new(x, y),
+                        Some(config.cursor_foreground_color),
+                        Some(config.cursor_background_color),
                     )),
                     None => viewport.draw_pixel(Pixel::new(
                         text[i],
@@ -132,7 +139,7 @@ fn play() -> error::Result<()> {
     let stdout = StdoutTarget::new().expect("failed to enter raw mode");
     let mut renderer = Renderer::new(stdout);
 
-    render(&game, &mut viewport, &mut renderer);
+    render(&game, &config, &mut viewport, &mut renderer);
 
     for event in events(EventModel::Blocking) {
         match event {
@@ -168,7 +175,7 @@ fn play() -> error::Result<()> {
             Event::Key(_) => (),
         }
 
-        render(&game, &mut viewport, &mut renderer);
+        render(&game, &config, &mut viewport, &mut renderer);
     }
 
     Ok(())
