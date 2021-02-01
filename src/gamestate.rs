@@ -1,5 +1,6 @@
 use std::time::{Duration, Instant};
 
+#[derive(PartialEq)]
 pub enum GameState {
     Stopped,
     Running(Instant),
@@ -54,19 +55,67 @@ impl Game {
     }
 
     pub fn push(&mut self, c: char) {
+        let current_index = self.input.len();
+        let next_index = current_index + 1;
+
+        let mut skip = false;
+        let mut ignore = false;
+
+        // if space is pressed
+        if c == ' ' {
+            if let Some(n) = self.text.chars().skip(current_index).next() {
+                // and we are currently not on a space char
+                if n != ' ' {
+                    // ignore the input
+                    ignore = true;
+                    // if we are not at index 0
+                    if current_index > 0 {
+                        if let Some(prev) = self.text.chars().skip(current_index - 1).next() {
+                            // and the previous char was not space
+                            if prev != ' ' {
+                                // skip word
+                                skip = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if skip {
+            // skip until next space character
+            for _ in self.text.chars().skip(current_index).take_while(|&n| n != ' ') {
+                self.input.push(' ');
+                self.mistakes += 1;
+            }
+            // including the space character itself
+            self.input.push(' ');
+            self.mistakes += 1;
+            if self.input.len() >= self.text.len() {
+                self.finish();
+            }
+            return;
+        }
+
+        if ignore {
+            return;
+        }
+
         self.input.push(c);
 
-        let input_chars = self.input.chars().collect::<Vec<_>>();
-        let text_chars = self.text.chars().take(input_chars.len());
+        let a = self.input.chars().last();
+        let b = self.text.chars().take(next_index).last();
 
-        let a = input_chars.last().expect("this should always be some");
-        let b = text_chars.last().expect("this should always be some");
+        // if we have mistyped and press space after the last word
+        // quit the game
+        let should_quit = self.input.len() > self.text.len() + 1 && a.unwrap_or('.') == ' ';
 
-        if *a != b {
+        if !should_quit && a != b {
             self.mistakes += 1;
         }
 
-        if self.input == self.text {
+        // if we input the text correctly or we press space after the last word
+        if self.input == self.text || should_quit {
             self.finish();
         }
     }
