@@ -8,6 +8,7 @@ pub struct Config {
     pub project_path: PathBuf,
     pub file_extension: String,
     pub word_count: usize,
+    pub strict: bool,
     pub cursor_foreground_color: Color,
     pub cursor_background_color: Color,
 }
@@ -21,6 +22,7 @@ impl Config {
         let mut background_color = None;
 
         let mut argc = 0;
+        let mut strict = false;
 
         while let Some(arg) = args.next() {
             argc += 1;
@@ -38,8 +40,8 @@ impl Config {
                         file_extension.remove(0);
                     }
                 }
-                "-p" => {
-                    project_path = args.next();
+                "-s" => {
+                    strict = true;
                 }
                 "-cf" => {
                     let front_color = args.next().unwrap_or("green".to_string());
@@ -65,7 +67,9 @@ impl Config {
                         }
                     }
                 }
-                _ => {}
+                arg => {
+                    project_path = Some(arg.to_owned());
+                }
             }
         }
 
@@ -86,6 +90,7 @@ impl Config {
             word_count,
             project_path: project_path.into(),
             file_extension,
+            strict,
             cursor_foreground_color: foreground_color.unwrap_or(Color::Green),
             cursor_background_color: background_color.unwrap_or(Color::DarkGrey),
         };

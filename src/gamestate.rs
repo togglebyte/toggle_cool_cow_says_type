@@ -1,5 +1,6 @@
 use std::time::{Duration, Instant};
 
+#[derive(PartialEq)]
 pub enum GameState {
     Stopped,
     Running(Instant),
@@ -19,10 +20,11 @@ pub struct Game {
     mistakes: usize,
     word_count: usize,
     pub state: GameState,
+    strict: bool,
 }
 
 impl Game {
-    pub fn new(words: Vec<String>) -> Self {
+    pub fn new(words: Vec<String>, strict: bool) -> Self {
         let word_count = words.len();
         let text = words.join(" ");
         let text_chars = text.chars().collect::<Vec<_>>();
@@ -34,6 +36,7 @@ impl Game {
             text_chars,
             mistakes: 0,
             state: GameState::Stopped,
+            strict,
         }
     }
 
@@ -54,20 +57,71 @@ impl Game {
     }
 
     pub fn push(&mut self, c: char) {
+        let current_index = self.input.len();
+        let next_index = current_index + 1;
+
+        let mut skip = false;
+        let mut ignore = false;
+
+        // if space is pressed
+        if c == ' ' {
+            if let Some(n) = self.text.chars().skip(current_index).next() {
+                // and we are currently not on a space char
+                if n != ' ' {
+                    // ignore the input
+                    ignore = true;
+                    // if we are not at index 0
+                    if current_index > 0 {
+                        if let Some(prev) = self.text.chars().skip(current_index - 1).next() {
+                            // and the previous char was not space
+                            if prev != ' ' {
+                                // skip word
+                                skip = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if skip {
+            // skip until next space character
+            for _ in self.text.chars().skip(current_index).take_while(|&n| n != ' ') {
+                self.input.push(' ');
+                self.mistakes += 1;
+            }
+            // including the space character itself
+            self.input.push(' ');
+            self.mistakes += 1;
+            if !self.strict && self.input.len() >= self.text.len() {
+                self.finish();
+            }
+            return;
+        }
+
+        if ignore {
+            return;
+        }
+
         self.input.push(c);
 
-        let input_chars = self.input.chars().collect::<Vec<_>>();
-        let text_chars = self.text.chars().take(input_chars.len());
+        let b = self.text.chars().take(next_index).last();
 
-        let a = input_chars.last().expect("this should always be some");
-        let b = text_chars.last().expect("this should always be some");
+        // if we have mistyped and press space after the last word
+        // quit the game
+        let should_quit = !self.strict && next_index >= self.text.len() + 1 && c == ' ';
 
-        if *a != b {
+        if !should_quit && Some(c) != b {
             self.mistakes += 1;
         }
 
-        if self.input == self.text {
+        // if we input the text correctly or we press space after the last word
+        if self.input == self.text || should_quit {
             self.finish();
+        }
+
+        if self.input.len() > self.text.len() {
+            self.input.pop();
         }
     }
 
@@ -112,7 +166,7 @@ mod test {
     #[test]
     fn test_wpm() {
         let words = vec!["one".to_string(), "two".into(), "three".into()];
-        let gs = Game::new(words);
+        let gs = Game::new(words, false);
         let wpm = gs.wpm(Duration::from_secs(60));
         assert_eq!(wpm, 3);
     }
@@ -120,13 +174,13 @@ mod test {
     #[test]
     fn test_word_count() {
         let words = vec!["one".to_string(), "two".into(), "three".into()];
-        let gs = Game::new(words);
+        let gs = Game::new(words, false);
         assert_eq!(gs.word_count, 3);
     }
 
     #[test]
     fn test_mistakes() {
-        let mut gs = Game::new(vec!["one".into()]);
+        let mut gs = Game::new(vec!["one".into()], false);
         gs.push('o');
         assert_eq!(gs.mistakes, 0);
         gs.push('o');

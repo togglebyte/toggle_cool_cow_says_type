@@ -106,7 +106,7 @@ fn render(game: &Game, config: &Config, viewport: &mut Viewport, renderer: &mut 
             accuracy,
         } => {
             let text = format!(
-                "time: {} seconds | wpm: {} | mistakes: {} | accuracy: {:.2}% | word count: {}",
+                "time: {} seconds | wpm: {} | mistakes: {} | accuracy: {:.2}% | word count: {}\nDo you want to try again? y/n",
                 elapsed.as_secs(),
                 wpm,
                 mistakes,
@@ -132,7 +132,7 @@ fn play() -> error::Result<()> {
     let (w, h) = term_size().expect("could not get terminal size");
     let selected_words = words(&config, (w * h) as usize)?;
 
-    let mut game = Game::new(selected_words);
+    let mut game = Game::new(selected_words, config.strict);
 
     let mut viewport = Viewport::new(ScreenPos::zero(), ScreenSize::new(w, h));
 
@@ -155,7 +155,7 @@ fn play() -> error::Result<()> {
                 GameState::Finished { .. } => {
                     if c == 'y' {
                         let selected_words = words(&config, (w * h) as usize)?;
-                        game = Game::new(selected_words);
+                        game = Game::new(selected_words, config.strict);
                     } else if c == 'n' {
                         break;
                     }
@@ -164,6 +164,12 @@ fn play() -> error::Result<()> {
                     game.push(c);
                 }
                 GameState::Stopped => game.start(),
+            },
+            Event::Key(KeyEvent {
+                code: KeyCode::Enter,
+                ..
+            }) => if game.state == GameState::Stopped {
+                game.start()
             },
             Event::Key(KeyEvent {
                 code: KeyCode::Backspace,
