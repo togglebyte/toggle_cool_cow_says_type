@@ -33,10 +33,9 @@ impl Config {
                         file_extension.remove(0);
                     }
                 }
-                "-p" => {
-                    project_path = args.next();
+                arg => {
+                    project_path = Some(arg.to_owned());
                 }
-                _ => {}
             }
         }
 
