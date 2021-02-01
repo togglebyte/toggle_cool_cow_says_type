@@ -2,12 +2,15 @@ use std::env::Args;
 use std::path::PathBuf;
 
 use crate::error::{Error, Result};
+use tinybit::Color;
 
 pub struct Config {
     pub project_path: PathBuf,
     pub file_extension: String,
     pub word_count: usize,
     pub strict: bool,
+    pub cursor_foreground_color: Color,
+    pub cursor_background_color: Color,
 }
 
 impl Config {
@@ -15,6 +18,8 @@ impl Config {
         let mut word_count = 10;
         let mut project_path = None;
         let mut file_extension = "rs".to_string();
+        let mut foreground_color = None;
+        let mut background_color = None;
 
         let mut argc = 0;
         let mut strict = false;
@@ -37,6 +42,30 @@ impl Config {
                 }
                 "-s" => {
                     strict = true;
+                }
+                "-cf" => {
+                    let front_color = args.next().unwrap_or("green".to_string());
+                    if let Ok(c) = front_color.parse::<u8>() {
+                        foreground_color = Some(Color::AnsiValue(c));
+                    } else {
+                        if let Ok(c) = front_color.parse::<Color>() {
+                            foreground_color = Some(c);
+                        } else {
+                            return Err(Error::InvalidColor);
+                        }
+                    }
+                }
+                "-cb" => {
+                    let back_color = args.next().unwrap_or("dark_grey".to_string());
+                    if let Ok(c) = back_color.parse::<u8>() {
+                        background_color = Some(Color::AnsiValue(c));
+                    } else {
+                        if let Ok(c) = back_color.parse::<Color>() {
+                            background_color = Some(c);
+                        } else {
+                            return Err(Error::InvalidColor);
+                        }
+                    }
                 }
                 arg => {
                     project_path = Some(arg.to_owned());
@@ -62,6 +91,8 @@ impl Config {
             project_path: project_path.into(),
             file_extension,
             strict,
+            cursor_foreground_color: foreground_color.unwrap_or(Color::Green),
+            cursor_background_color: background_color.unwrap_or(Color::DarkGrey),
         };
 
         Ok(inst)

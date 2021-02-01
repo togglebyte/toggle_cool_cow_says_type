@@ -7,12 +7,14 @@ pub enum Error {
     InsufficientWords,
     ZeroWordCount,
     NeedsHelp,
+    InvalidColor,
 }
 
 impl Error {
     pub fn to_string(self) -> String {
         match self {
             Error::PathMissing => "provide a path to a Rust project".into(),
+            Error::InvalidColor => "Color needs to be an u8 or a color string.".into(),
             Error::NoFiles => "No code files found".into(),
             Error::InsufficientWords => "Not enough words to meet word count".into(),
             Error::ZeroWordCount => "Word count can not be zero".into(),
