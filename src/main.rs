@@ -20,7 +20,7 @@ fn render(game: &Game, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTa
     match game.state {
         GameState::Running(_) => {
             let input = game.input();
-            let text = &game.text_chars; //.iter().skip(input.len());
+            let text = &game.text_chars;
 
             let char_count = game.text.chars().count() as u16;
             let lines = char_count / viewport.size.width;
@@ -82,25 +82,6 @@ fn render(game: &Game, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTa
                     y += 1;
                 }
             }
-
-            // for (c, correct) in input {
-            //     let color = match correct {
-            //         true => Color::Blue,
-            //         false => Color::Red,
-            //     };
-            //     viewport.draw_pixel(Pixel::new(c, ScreenPos::new(x, y), Some(color), None));
-            //     x += 1;
-            // }
-
-            // for c in text {
-            //     viewport.draw_pixel(Pixel::new(
-            //         *c,
-            //         ScreenPos::new(x, y),
-            //         Some(Color::White),
-            //         None,
-            //     ));
-            //     x += 1;
-            // }
         }
         GameState::Stopped => {
             let text = "Press any key to start";
@@ -141,11 +122,11 @@ fn render(game: &Game, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTa
 // -----------------------------------------------------------------------------
 fn play() -> error::Result<()> {
     let config = Config::from_args(args())?;
-    let selected_words = words(&config)?;
+    let (w, h) = term_size().expect("could not get terminal size");
+    let selected_words = words(&config, (w * h) as usize)?;
 
     let mut game = Game::new(selected_words);
 
-    let (w, h) = term_size().expect("could not get terminal size");
     let mut viewport = Viewport::new(ScreenPos::zero(), ScreenSize::new(w, h));
 
     let stdout = StdoutTarget::new().expect("failed to enter raw mode");
@@ -166,7 +147,7 @@ fn play() -> error::Result<()> {
             }) => match game.state {
                 GameState::Finished { .. } => {
                     if c == 'y' {
-                        let selected_words = words(&config)?;
+                        let selected_words = words(&config, (w * h) as usize)?;
                         game = Game::new(selected_words);
                     } else if c == 'n' {
                         break;
@@ -196,9 +177,7 @@ fn play() -> error::Result<()> {
 fn main() {
     match play() {
         Ok(()) => (),
-        Err(e) if e == error::Error::NeedsHelp => {
-            println!("{}", e.to_string());
-        }
+        Err(e) if e == error::Error::NeedsHelp => println!("{}", e.to_string()),
         Err(e) => {
             eprintln!(
                 "{}\nError: {}",
