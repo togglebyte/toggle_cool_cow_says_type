@@ -118,7 +118,7 @@ fn render(game: &Game, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTa
             accuracy,
         } => {
             let text = format!(
-                "time: {} seconds | wpm: {} | mistakes: {} | accuracy: {:.2}% | word count: {}",
+                "time: {} seconds | wpm: {} | mistakes: {} | accuracy: {:.2}% | word count: {}\nDo you want to try again? y/n",
                 elapsed.as_secs(),
                 wpm,
                 mistakes,
@@ -176,6 +176,12 @@ fn play() -> error::Result<()> {
                     game.push(c);
                 }
                 GameState::Stopped => game.start(),
+            },
+            Event::Key(KeyEvent {
+                code: KeyCode::Enter,
+                ..
+            }) => if game.state == GameState::Stopped {
+                game.start()
             },
             Event::Key(KeyEvent {
                 code: KeyCode::Backspace,
