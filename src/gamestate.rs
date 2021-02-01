@@ -60,18 +60,21 @@ impl Game {
         let current_index = self.input.len();
         let next_index = current_index + 1;
 
+        // Skip the entire word if space was pressed anywhere
+        // but on the first character of the word, or as the absolute
+        // first input.
         match (c, self.text.chars().skip(current_index).next()) {
             // If space is pressed and current char is not a space,
             // and there is some player input, we advance the cursor
             // to the next word and count skipped chars as mistakes.
-            (' ', Some(nc)) if nc != ' ' && current_index > 0 => {
-                let prev = match self.text.chars().skip(current_index - 1).next() {
+            (' ', Some(current)) if current != ' ' && current_index > 0 => {
+
+                // Don't advance if the cursor is at the beginning of a word
+                match self.text.chars().skip(current_index - 1).next() {
                     None | Some(' ') => return,
-                    Some(p) => p,
+                    Some(_) => (),
                 };
 
-                // and the previous char was not space
-                // skip word
                 let mistakes = self
                     .text
                     .chars()

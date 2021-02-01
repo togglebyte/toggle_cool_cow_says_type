@@ -66,7 +66,10 @@ impl Config {
                         }
                     }
                 }
-                arg => project_path = Some(arg.to_owned()),
+                arg => {
+                    let path: String = shellexpand::tilde(arg).to_string();
+                    project_path = Some(path);
+                }
             }
         }
 

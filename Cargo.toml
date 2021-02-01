@@ -1,6 +1,6 @@
 [package]
 name = "toggle_cool_cow_says_type"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Togglebit <me@togglebit.io>"]
 edition = "2018"
 
@@ -10,3 +10,4 @@ edition = "2018"
 rand = "0.8.3"
 tinybit = { git = "https://github.com/togglebyte/tinybit" }
 walkdir = "2.3.1"
+shellexpand = "2.1.0"
