@@ -1,6 +1,6 @@
 use std::env::args;
 
-use tinybit::events::{events, Event, EventModel, KeyCode, KeyEvent};
+use tinybit::events::{events, Event, EventModel, KeyCode, KeyEvent, KeyModifiers};
 use tinybit::widgets::Text;
 use tinybit::{term_size, Color, Pixel, Renderer, ScreenPos, ScreenSize, StdoutTarget, Viewport};
 
@@ -157,6 +157,11 @@ fn play() -> error::Result<()> {
                 viewport.resize(w, h);
                 renderer.clear();
             }
+            Event::Key(KeyEvent {
+                code: KeyCode::Char('w'),
+                modifiers,
+                ..
+            }) if modifiers == KeyModifiers::CONTROL => game.pop_word(),
             Event::Key(KeyEvent {
                 code: KeyCode::Char(c),
                 ..

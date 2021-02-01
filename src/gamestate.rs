@@ -118,7 +118,25 @@ impl Game {
     }
 
     pub fn pop(&mut self) {
-        self.input.pop();
+        match self.input.chars().last() {
+            Some(' ') => {
+                while let Some(' ') = self.input.chars().last() {
+                    self.input.pop();
+                }
+            }
+            _ => drop(self.input.pop()),
+        }
+    }
+
+    pub fn pop_word(&mut self) {
+        // pop all whitespaces
+        while let Some(' ') = self.input.chars().last() {
+            self.input.pop();
+        }
+        // pop until whitespace or no chars left
+        while let Some(_) = self.input.chars().last().filter(|&c| c != ' ') {
+            self.input.pop();
+        }
     }
 
     pub fn start(&mut self) {
