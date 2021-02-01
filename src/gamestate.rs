@@ -105,14 +105,13 @@ impl Game {
 
         self.input.push(c);
 
-        let a = self.input.chars().last();
         let b = self.text.chars().take(next_index).last();
 
         // if we have mistyped and press space after the last word
         // quit the game
-        let should_quit = !self.strict && next_index >= self.text.len() + 1 && a.unwrap_or('.') == ' ';
+        let should_quit = !self.strict && next_index >= self.text.len() + 1 && c == ' ';
 
-        if !should_quit && a != b {
+        if !should_quit && Some(c) != b {
             self.mistakes += 1;
         }
 
@@ -167,7 +166,7 @@ mod test {
     #[test]
     fn test_wpm() {
         let words = vec!["one".to_string(), "two".into(), "three".into()];
-        let gs = Game::new(words);
+        let gs = Game::new(words, false);
         let wpm = gs.wpm(Duration::from_secs(60));
         assert_eq!(wpm, 3);
     }
@@ -175,13 +174,13 @@ mod test {
     #[test]
     fn test_word_count() {
         let words = vec!["one".to_string(), "two".into(), "three".into()];
-        let gs = Game::new(words);
+        let gs = Game::new(words, false);
         assert_eq!(gs.word_count, 3);
     }
 
     #[test]
     fn test_mistakes() {
-        let mut gs = Game::new(vec!["one".into()]);
+        let mut gs = Game::new(vec!["one".into()], false);
         gs.push('o');
         assert_eq!(gs.mistakes, 0);
         gs.push('o');
