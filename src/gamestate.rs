@@ -14,12 +14,12 @@ pub enum GameState {
 }
 
 pub struct Game {
-    input: String,
     pub text: String,
     pub text_chars: Vec<char>,
+    pub state: GameState,
+    input: String,
     mistakes: usize,
     word_count: usize,
-    pub state: GameState,
     strict: bool,
 }
 
@@ -60,48 +60,37 @@ impl Game {
         let current_index = self.input.len();
         let next_index = current_index + 1;
 
-        let mut skip = false;
-        let mut ignore = false;
+        match (c, self.text.chars().skip(current_index).next()) {
+            // If space is pressed and current char is not a space,
+            // and there is some player input, we advance the cursor
+            // to the next word and count skipped chars as mistakes.
+            (' ', Some(nc)) if nc != ' ' && current_index > 0 => {
+                let prev = match self.text.chars().skip(current_index - 1).next() {
+                    None | Some(' ') => return,
+                    Some(p) => p,
+                };
 
-        // if space is pressed
-        if c == ' ' {
-            if let Some(n) = self.text.chars().skip(current_index).next() {
-                // and we are currently not on a space char
-                if n != ' ' {
-                    // ignore the input
-                    ignore = true;
-                    // if we are not at index 0
-                    if current_index > 0 {
-                        if let Some(prev) = self.text.chars().skip(current_index - 1).next() {
-                            // and the previous char was not space
-                            if prev != ' ' {
-                                // skip word
-                                skip = true;
-                            }
-                        }
-                    }
+                // and the previous char was not space
+                // skip word
+                let mistakes = self
+                    .text
+                    .chars()
+                    .skip(current_index)
+                    .take_while(|&n| n != ' ')
+                    .count() + 1; // + 1 for the initial space character.
+
+                (0..mistakes).for_each(|_| self.input.push(' '));
+                self.mistakes += mistakes;
+
+                if !self.strict && self.input.len() >= self.text.len() {
+                    self.finish();
                 }
-            }
-        }
 
-        if skip {
-            // skip until next space character
-            for _ in self.text.chars().skip(current_index).take_while(|&n| n != ' ') {
-                self.input.push(' ');
-                self.mistakes += 1;
+                return;
             }
-            // including the space character itself
-            self.input.push(' ');
-            self.mistakes += 1;
-            if !self.strict && self.input.len() >= self.text.len() {
-                self.finish();
-            }
-            return;
-        }
-
-        if ignore {
-            return;
-        }
+            (' ', Some(nc)) if nc != ' ' => return,
+            _ => (),
+        };
 
         self.input.push(c);
 
@@ -145,7 +134,9 @@ impl Game {
                     let a = 100.0 - (mistakes / char_count) * 100.0;
                     if a < 0.0 {
                         0.0
-                    } else { a }
+                    } else {
+                        a
+                    }
                 };
                 self.state = GameState::Finished {
                     elapsed,

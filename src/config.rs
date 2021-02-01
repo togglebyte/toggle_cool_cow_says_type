@@ -32,7 +32,7 @@ impl Config {
                     word_count = args
                         .next()
                         .and_then(|s| s.parse::<usize>().ok())
-                        .unwrap_or(10);
+                        .unwrap_or(10)
                 }
                 "-t" => {
                     file_extension = args.next().unwrap_or("rs".to_string());
@@ -40,9 +40,8 @@ impl Config {
                         file_extension.remove(0);
                     }
                 }
-                "-s" => {
-                    strict = true;
-                }
+                "-v" => return Err(Error::Version),
+                "-s" => strict = true,
                 "-cf" => {
                     let front_color = args.next().unwrap_or("green".to_string());
                     if let Ok(c) = front_color.parse::<u8>() {
@@ -67,9 +66,7 @@ impl Config {
                         }
                     }
                 }
-                arg => {
-                    project_path = Some(arg.to_owned());
-                }
+                arg => project_path = Some(arg.to_owned()),
             }
         }
 
@@ -110,20 +107,19 @@ mod test {
 
     #[test]
     fn parse_word_count() {
-        let args = "-w 12 -p /".split_whitespace().map(str::to_owned);
+        let args = "-w 12 /".split_whitespace().map(str::to_owned);
         let config = Config::from_iter(args).unwrap();
         assert_eq!(config.word_count, 12);
     }
 
     #[test]
     fn parse_error() {
-        // Missing path value
-        let args = "-p".split_whitespace().map(str::to_owned);
-        assert!(matches!(Config::from_iter(args), Err(PathMissing)));
-
         // Missing path arg
-        let args = "".split_whitespace().map(str::to_owned);
-        assert!(matches!(Config::from_iter(args), Err(PathMissing)));
+        let args = vec!["-s".to_string(), "-t".into(), "c".into()];
+        assert!(matches!(
+            Config::from_iter(args.into_iter()),
+            Err(PathMissing)
+        ));
     }
 
     #[test]

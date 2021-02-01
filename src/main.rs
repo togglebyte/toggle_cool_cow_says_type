@@ -16,7 +16,12 @@ use words::words;
 // -----------------------------------------------------------------------------
 //     - Render -
 // -----------------------------------------------------------------------------
-fn render(game: &Game, config: &Config, viewport: &mut Viewport, renderer: &mut Renderer<StdoutTarget>) {
+fn render(
+    game: &Game,
+    config: &Config,
+    viewport: &mut Viewport,
+    renderer: &mut Renderer<StdoutTarget>,
+) {
     match game.state {
         GameState::Running(_) => {
             let input = game.input();
@@ -106,7 +111,7 @@ fn render(game: &Game, config: &Config, viewport: &mut Viewport, renderer: &mut 
             accuracy,
         } => {
             let text = format!(
-                "time: {} seconds | wpm: {} | mistakes: {} | accuracy: {:.2}% | word count: {}\nDo you want to try again? y/n",
+                "time: {} seconds | wpm: {} | mistakes: {} | accuracy: {:.2}% | word count: {}",
                 elapsed.as_secs(),
                 wpm,
                 mistakes,
@@ -114,10 +119,14 @@ fn render(game: &Game, config: &Config, viewport: &mut Viewport, renderer: &mut 
                 word_count
             );
             let x = (viewport.size.width - text.chars().count() as u16) / 2;
-            let y = viewport.size.height / 2;
+            let y = viewport.size.height / 2 - 1;
 
             let text = Text::new(text, None, None);
             viewport.draw_widget(&text, ScreenPos::new(x, y));
+
+            let text = "Try again? y/n".to_string();
+            let text = Text::new(text, None, None);
+            viewport.draw_widget(&text, ScreenPos::new(x, y + 2));
         }
     }
 
@@ -168,9 +177,11 @@ fn play() -> error::Result<()> {
             Event::Key(KeyEvent {
                 code: KeyCode::Enter,
                 ..
-            }) => if game.state == GameState::Stopped {
-                game.start()
-            },
+            }) => {
+                if game.state == GameState::Stopped {
+                    game.start()
+                }
+            }
             Event::Key(KeyEvent {
                 code: KeyCode::Backspace,
                 ..
@@ -191,6 +202,7 @@ fn main() {
     match play() {
         Ok(()) => (),
         Err(e) if e == error::Error::NeedsHelp => println!("{}", e.to_string()),
+        Err(e) if e == error::Error::Version => println!("{}", e.to_string()),
         Err(e) => {
             eprintln!(
                 "{}\nError: {}",
