@@ -53,7 +53,7 @@ fn choose_words(words: Vec<String>, word_count: usize, rng: &mut ThreadRng) -> V
     words[to..to + word_count].into()
 }
 
-pub fn words(config: &Config) -> Result<Vec<String>> {
+pub fn words(config: &Config, max_len: usize) -> Result<Vec<String>> {
     let mut rng = thread_rng();
 
     let mut files = find_files(config.project_path.clone(), &config.file_extension);
@@ -64,9 +64,12 @@ pub fn words(config: &Config) -> Result<Vec<String>> {
     loop {
         match files.choose(&mut rng) {
             Some(file) => {
-                let pos = files.iter().position(|f| f == file).unwrap();
-                let file = files.remove(pos);
-                let code = read_to_string(file).expect("file was deleted during execution!");
+                let file_index = files.iter().position(|f| f == file).unwrap();
+                let file = files.remove(file_index);
+                let mut code = read_to_string(file).expect("file was deleted during execution!");
+                if code.chars().count() > max_len {
+                    code = code[..max_len].to_string();
+                }
                 let words = code_to_words(code);
 
                 if words.len() < config.word_count {
@@ -104,4 +107,11 @@ mod test {
         let chosen = choose_words(words.clone(), 3, &mut rng);
         assert_eq!(words, chosen);
     }
+
+    // #[test]
+    // fn split_words() {
+    //     let text = "a word::here".to_string();
+    //     let words = code_to_words(text);
+    //     assert_eq!(words.len(), 3);
+    // }
 }
