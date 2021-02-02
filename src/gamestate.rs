@@ -43,7 +43,7 @@ impl Game {
     fn wpm(&self, dur: Duration) -> usize {
         // the average word length in English is 4.7 characters, so we are using 5
         // ideally we would also compare this to collected correct characters to provide additional normalize results
-        ((self.text.len() as f32 * (60.0 / dur.as_secs_f32())) / 5.0) as usize
+        ((self.text.chars().count() as f32 * (60.0 / dur.as_secs_f32())) / 5.0) as usize
     }
 
     pub fn input(&self) -> Vec<(char, bool)> {
@@ -178,7 +178,7 @@ mod test {
 
     #[test]
     fn test_wpm() {
-        let words = vec!["one".to_string(), "two".into(), "three".into()];
+        let words = vec!["fives".to_string(), "fives".into(), "fives".into()];
         let gs = Game::new(words, false);
         let wpm = gs.wpm(Duration::from_secs(60));
         assert_eq!(wpm, 3);

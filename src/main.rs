@@ -33,7 +33,7 @@ fn render(
 
             // Find the starting x value.
             let mut x = if lines > 1 {
-                0
+                1
             } else {
                 (viewport.size.width - game.text.chars().count() as u16) / 2
             };
@@ -90,7 +90,7 @@ fn render(
 
                 x += 1;
                 if x >= viewport.size.width {
-                    x = 0;
+                    x = 1;
                     y += 1;
                 }
             }
@@ -159,9 +159,12 @@ fn play() -> error::Result<()> {
             }
             Event::Key(KeyEvent {
                 code: KeyCode::Char('w'),
-                modifiers,
-                ..
-            }) if modifiers == KeyModifiers::CONTROL => game.pop_word(),
+                modifiers: KeyModifiers::CONTROL,
+            }) => game.pop_word(),
+            Event::Key(KeyEvent {
+                code: KeyCode::Char('c'),
+                modifiers: KeyModifiers::CONTROL,
+            }) => break,
             Event::Key(KeyEvent {
                 code: KeyCode::Char(c),
                 ..
@@ -182,18 +185,11 @@ fn play() -> error::Result<()> {
             Event::Key(KeyEvent {
                 code: KeyCode::Enter,
                 ..
-            }) => {
-                if game.state == GameState::Stopped {
-                    game.start()
-                }
-            }
+            }) if game.state == GameState::Stopped => game.start(),
             Event::Key(KeyEvent {
                 code: KeyCode::Backspace,
                 ..
             }) => game.pop(),
-            Event::Key(KeyEvent {
-                code: KeyCode::Esc, ..
-            }) => break,
             Event::Key(_) => (),
         }
 

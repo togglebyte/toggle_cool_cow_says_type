@@ -66,7 +66,10 @@ pub fn words(config: &Config, max_len: usize) -> Result<Vec<String>> {
             Some(file) => {
                 let file_index = files.iter().position(|f| f == file).unwrap();
                 let file = files.remove(file_index);
-                let mut code = read_to_string(file).expect("file was deleted during execution!");
+                let mut code = read_to_string(file)
+                    .expect("file was deleted during execution!")
+                    .trim()
+                    .to_string();
                 if code.chars().count() > max_len {
                     code = code[..max_len].to_string();
                 }
