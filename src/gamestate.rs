@@ -118,7 +118,25 @@ impl Game {
     }
 
     pub fn pop(&mut self) {
-        self.input.pop();
+        match self.input.chars().last() {
+            Some(' ') => {
+                while let Some(' ') = self.input.chars().last() {
+                    self.input.pop();
+                }
+            }
+            _ => drop(self.input.pop()),
+        }
+    }
+
+    pub fn pop_word(&mut self) {
+        let to_remove = self.input.len() - self
+            .input
+            .chars()
+            .rev()
+            .skip_while(|&c| c == ' ') // remove until non-whitespace is found
+            .skip_while(|&c| c != ' ') // remove until whitespace is found
+            .count();
+        (0..to_remove).for_each(|_| drop(self.input.pop()));
     }
 
     pub fn start(&mut self) {
