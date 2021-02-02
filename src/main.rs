@@ -106,14 +106,16 @@ fn render(
         GameState::Finished {
             elapsed,
             wpm,
+            cpm,
             mistakes,
             word_count,
             accuracy,
         } => {
             let text = format!(
-                "time: {} seconds | wpm: {} | mistakes: {} | accuracy: {:.2}% | word count: {}",
+                "time: {} seconds | wpm: {} (cpm: {}) | mistakes: {} | accuracy: {:.2}% | word count: {}",
                 elapsed.as_secs(),
                 wpm,
+                cpm,
                 mistakes,
                 accuracy,
                 word_count

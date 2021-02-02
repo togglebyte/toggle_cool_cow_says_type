@@ -7,6 +7,7 @@ pub enum GameState {
     Finished {
         elapsed: Duration,
         wpm: usize,
+        cpm: usize,
         word_count: usize,
         mistakes: usize,
         accuracy: f32,
@@ -40,10 +41,15 @@ impl Game {
         }
     }
 
-    fn wpm(&self, dur: Duration) -> usize {
+    fn wpm(&self, dur: Duration) -> f32 {
         // the average word length in English is 4.7 characters, so we are using 5
         // ideally we would also compare this to collected correct characters to provide additional normalize results
-        ((self.text.chars().count() as f32 * (60.0 / dur.as_secs_f32())) / 5.0) as usize
+        // ((self.text.chars().count() as f32 * (60.0 / dur.as_secs_f32())) / 5.0) as usize
+        self.cpm(dur) / 5.0
+    }
+
+    fn cpm(&self, dur: Duration) -> f32 {
+        self.text.chars().count() as f32 * (60.0 / dur.as_secs_f32())
     }
 
     pub fn input(&self) -> Vec<(char, bool)> {
@@ -58,6 +64,9 @@ impl Game {
     }
 
     pub fn push(&mut self, c: char) {
+        if self.input.len() == 0 {
+            self.state = GameState::Running(Instant::now());
+        }
         let current_index = self.input.len();
         let next_index = current_index + 1;
 
@@ -162,7 +171,8 @@ impl Game {
                 };
                 self.state = GameState::Finished {
                     elapsed,
-                    wpm: self.wpm(elapsed),
+                    wpm: self.wpm(elapsed) as usize,
+                    cpm: self.cpm(elapsed) as usize,
                     word_count: self.word_count,
                     mistakes: self.mistakes,
                     accuracy,
