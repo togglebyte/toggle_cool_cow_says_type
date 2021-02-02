@@ -41,8 +41,9 @@ impl Game {
     }
 
     fn wpm(&self, dur: Duration) -> usize {
-        let ms = dur.as_millis() as f32 / 1000.0 / 60.0;
-        (self.word_count as f32 / ms) as usize
+        // the average word length in English is 4.7 characters, so we are using 5
+        // ideally we would also compare this to collected correct characters to provide additional normalize results
+        ((self.text.len() as f32 * (60.0 / dur.as_secs_f32())) / 5.0) as usize
     }
 
     pub fn input(&self) -> Vec<(char, bool)> {
@@ -68,7 +69,6 @@ impl Game {
             // and there is some player input, we advance the cursor
             // to the next word and count skipped chars as mistakes.
             (' ', Some(current)) if current != ' ' && current_index > 0 => {
-
                 // Don't advance if the cursor is at the beginning of a word
                 match self.text.chars().skip(current_index - 1).next() {
                     None | Some(' ') => return,
@@ -80,7 +80,8 @@ impl Game {
                     .chars()
                     .skip(current_index)
                     .take_while(|&n| n != ' ')
-                    .count() + 1; // + 1 for the initial space character.
+                    .count()
+                    + 1; // + 1 for the initial space character.
 
                 (0..mistakes).for_each(|_| self.input.push(' '));
                 self.mistakes += mistakes;
