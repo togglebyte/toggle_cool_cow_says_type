@@ -396,6 +396,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tccst"
+version = "0.1.2"
+dependencies = [
+ "rand",
+ "shellexpand",
+ "tinybit",
+ "walkdir",
+]
+
+[[package]]
 name = "tinybit"
 version = "0.1.0"
 source = "git+https://github.com/togglebyte/tinybit#ee98b4ce22c074dc17fd331010cd1cb7b76936bc"
@@ -404,16 +414,6 @@ dependencies = [
  "euclid",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "toggle_cool_cow_says_type"
-version = "0.1.1"
-dependencies = [
- "rand",
- "shellexpand",
- "tinybit",
- "walkdir",
 ]
 
 [[package]]
