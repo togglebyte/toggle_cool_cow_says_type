@@ -1,6 +1,6 @@
 [package]
 name = "toggle_cool_cow_says_type"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Togglebit <me@togglebit.io>", "_Bare <bare@logixsr.com>", "hardliner66 <hardliner66@gmail.com>"]
 edition = "2018"
 
