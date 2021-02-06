@@ -126,7 +126,7 @@ fn render(
             let text = Text::new(text, None, None);
             viewport.draw_widget(&text, ScreenPos::new(x, y));
 
-            let text = "Try again? y/n".to_string();
+            let text = "Try again? y(es) | n(no) | r(etry)".to_string();
             let text = Text::new(text, None, None);
             viewport.draw_widget(&text, ScreenPos::new(x, y + 2));
         }
@@ -141,9 +141,9 @@ fn render(
 fn play() -> error::Result<()> {
     let config = Config::from_args(args())?;
     let (w, h) = term_size().expect("could not get terminal size");
-    let selected_words = words(&config, (w * h) as usize)?;
+    let mut selected_words = words(&config, (w * h) as usize)?;
 
-    let mut game = Game::new(selected_words, config.strict);
+    let mut game = Game::new(&selected_words, config.strict);
 
     let mut viewport = Viewport::new(ScreenPos::zero(), ScreenSize::new(w, h));
 
@@ -171,14 +171,15 @@ fn play() -> error::Result<()> {
                 code: KeyCode::Char(c),
                 ..
             }) => match game.state {
-                GameState::Finished { .. } => {
-                    if c == 'y' {
-                        let selected_words = words(&config, (w * h) as usize)?;
-                        game = Game::new(selected_words, config.strict);
-                    } else if c == 'n' {
-                        break;
+                GameState::Finished { .. } => match c {
+                    'y' => {
+                        selected_words = words(&config, (w * h) as usize)?;
+                        game = Game::new(&selected_words, config.strict);
                     }
-                }
+                    'r' => game = Game::new(&selected_words, config.strict),
+                    'n' => break,
+                    _ => {}
+                },
                 GameState::Running(_) => {
                     game.push(c);
                 }

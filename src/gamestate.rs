@@ -25,7 +25,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(words: Vec<String>, strict: bool) -> Self {
+    pub fn new(words: &[String], strict: bool) -> Self {
         let word_count = words.len();
         let text = words.join(" ");
         let text_chars = text.chars().collect::<Vec<_>>();
