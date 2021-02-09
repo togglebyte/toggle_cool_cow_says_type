@@ -408,7 +408,7 @@ dependencies = [
 [[package]]
 name = "tinybit"
 version = "0.1.0"
-source = "git+https://github.com/togglebyte/tinybit#ee98b4ce22c074dc17fd331010cd1cb7b76936bc"
+source = "git+https://github.com/togglebyte/tinybit#833fad11091715b7f591c39ff14429f4e08516e0"
 dependencies = [
  "crossterm",
  "euclid",
