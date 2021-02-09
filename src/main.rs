@@ -3,6 +3,7 @@ use std::env::args;
 use tinybit::events::{events, Event, EventModel, KeyCode, KeyEvent, KeyModifiers};
 use tinybit::widgets::Text;
 use tinybit::{term_size, Color, Pixel, Renderer, ScreenPos, ScreenSize, StdoutTarget, Viewport};
+use tinybit::render::RenderTarget;
 
 mod config;
 mod error;
@@ -16,11 +17,11 @@ use words::words;
 // -----------------------------------------------------------------------------
 //     - Render -
 // -----------------------------------------------------------------------------
-fn render(
+fn render<T: RenderTarget>(
     game: &Game,
     config: &Config,
     viewport: &mut Viewport,
-    renderer: &mut Renderer<StdoutTarget>,
+    renderer: &mut Renderer<T>,
 ) {
     match game.state {
         GameState::Running(_) => {
@@ -32,10 +33,10 @@ fn render(
             let lines = char_count / viewport.size.width;
 
             // Find the starting x value.
-            let mut x = if lines > 1 {
+            let mut x = if lines > 0 {
                 1
             } else {
-                (viewport.size.width - game.text.chars().count() as u16) / 2
+                (viewport.size.width - char_count) / 2
             };
 
             let mut y = viewport.size.height / 2 - lines / 2;
