@@ -127,7 +127,7 @@ fn render<T: RenderTarget>(
             let text = Text::new(text, None, None);
             viewport.draw_widget(&text, ScreenPos::new(x, y));
 
-            let text = "Try again? y(es) | n(no) | r(etry)".to_string();
+            let text = "Try again? Y(es) | N(no) | R(etry same words)".to_string();
             let text = Text::new(text, None, None);
             viewport.draw_widget(&text, ScreenPos::new(x, y + 2));
         }
