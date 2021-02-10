@@ -26,7 +26,7 @@ impl Config {
 
         while let Some(arg) = args.next() {
             argc += 1;
-            match arg.to_lowercase().as_ref() {
+            match arg.as_ref() {
                 "-h" | "-?" | "--h" | "--?" => return Err(Error::NeedsHelp),
                 "-w" => {
                     word_count = args
