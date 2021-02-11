@@ -8,6 +8,7 @@ pub enum Error {
     ZeroWordCount,
     NeedsHelp,
     InvalidColor,
+    InvalidFile,
     Version,
 }
 
@@ -16,6 +17,7 @@ impl Error {
         match self {
             Error::PathMissing => "Provide a path to a Rust project".into(),
             Error::InvalidColor => "Color needs to be a u8 or a color string.".into(),
+            Error::InvalidFile => "File format was incorrect (possibly binary?)".into(),
             Error::NoFiles => "No code files found".into(),
             Error::InsufficientWords => "Not enough words to meet word count".into(),
             Error::ZeroWordCount => "Word count can not be zero".into(),
