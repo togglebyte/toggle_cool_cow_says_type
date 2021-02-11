@@ -1,9 +1,9 @@
 use std::env::args;
 
 use tinybit::events::{events, Event, EventModel, KeyCode, KeyEvent, KeyModifiers};
+use tinybit::render::RenderTarget;
 use tinybit::widgets::Text;
 use tinybit::{term_size, Color, Pixel, Renderer, ScreenPos, ScreenSize, StdoutTarget, Viewport};
-use tinybit::render::RenderTarget;
 
 mod config;
 mod error;
@@ -112,24 +112,56 @@ fn render<T: RenderTarget>(
             word_count,
             accuracy,
         } => {
-            let text = format!(
-                "time: {} seconds | wpm: {} (cpm: {}) | mistakes: {} | accuracy: {:.2}% | word count: {}",
-                elapsed.as_secs(),
-                wpm,
-                cpm,
-                mistakes,
-                accuracy,
-                word_count
-            );
-            let x = (viewport.size.width - text.chars().count() as u16) / 2;
-            let y = viewport.size.height / 2 - 1;
+            // Split the text if the text is too long to fit on one line,
+            // and show the results as multiple lines.
+            let text_chunks: Vec<String> = {
+                let result_text = format!(
+                    "time: {} seconds | wpm: {} (cpm: {}) | mistakes: {} | accuracy: {:.2}% | word count: {}",
+                    elapsed.as_secs(),
+                    wpm,
+                    cpm,
+                    mistakes,
+                    accuracy,
+                    word_count
+                );
 
-            let text = Text::new(text, None, None);
-            viewport.draw_widget(&text, ScreenPos::new(x, y));
+                // If the result text can't fit on screen we split it on 
+                // the pipe char.
+                let mut chunks = if result_text.chars().count() as u16 > viewport.size.width {
+                    result_text.split('|').map(str::trim).map(String::from).collect()
+                } else {
+                    vec![result_text]
+                };
 
-            let text = "Try again? Y(es) | N(no) | R(etry same words)".to_string();
-            let text = Text::new(text, None, None);
-            viewport.draw_widget(&text, ScreenPos::new(x, y + 2));
+                // Add one empt line between the result
+                // and the try-again text.
+                chunks.push(String::from(" "));
+
+                let text = "Try again? Y(es) | N(no) | R(etry same words)".to_string();
+
+                // Same as for the result text: we split it on the pipe
+                // if it can't fit.
+                if text.chars().count() as u16 > viewport.size.width {
+                    let mut t = text.split('|').map(str::trim).map(String::from).collect();
+                    chunks.append(&mut t);
+                } else {
+                    chunks.push(text);
+                }
+
+                chunks
+            };
+
+            // Get the length of the longest line.
+            let max_width = text_chunks.iter().map(|t| t.chars().count()).max().unwrap() as u16;
+
+            let x = (viewport.size.width - max_width) / 2;
+            let mut y = viewport.size.height / 2 - text_chunks.len() as u16 / 2;
+
+            for chunk in text_chunks {
+                let text = Text::new(chunk, None, None);
+                viewport.draw_widget(&text, ScreenPos::new(x, y));
+                y += 1;
+            }
         }
     }
 
