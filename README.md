@@ -18,7 +18,7 @@ Example:
 toggle_cool_cow_says_type -p path_to_project -t c -w 5
 ```
 
-Named provided by BareCoolCowSaysMoomah won the naming poll.
+The name provided by BareCoolCowSaysMoomah won the naming poll.
 
 Colour Names:
 ```
