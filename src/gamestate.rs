@@ -192,7 +192,7 @@ mod test {
     #[test]
     fn test_wpm() {
         let words = vec!["fives".to_string(), "fives".into(), "fives".into()];
-        let gs = Game::new(&words, false);
+        let gs = Game::new(&words, false, false);
         let wpm = gs.wpm(Duration::from_secs(60));
         assert_eq!(wpm as usize, 3);
     }
@@ -200,13 +200,13 @@ mod test {
     #[test]
     fn test_word_count() {
         let words = vec!["one".to_string(), "two".into(), "three".into()];
-        let gs = Game::new(&words, false);
+        let gs = Game::new(&words, false, false);
         assert_eq!(gs.word_count, 3);
     }
 
     #[test]
     fn test_mistakes() {
-        let mut gs = Game::new(&vec!["one".into()], false);
+        let mut gs = Game::new(&vec!["one".into()], false, false);
         gs.push('o');
         assert_eq!(gs.mistakes, 0);
         gs.push('o');
