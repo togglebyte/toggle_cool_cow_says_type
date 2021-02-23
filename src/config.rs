@@ -4,11 +4,14 @@ use std::path::PathBuf;
 use crate::error::{Error, Result};
 use tinybit::Color;
 
+#[derive(Debug)] 
 pub struct Config {
     pub project_path: PathBuf,
     pub file_extension: String,
     pub word_count: usize,
     pub strict: bool,
+    pub skip_word_on_space: bool,
+    pub min_accuracy: Option<f32>,
     pub cursor_foreground_color: Color,
     pub cursor_background_color: Color,
 }
@@ -20,6 +23,8 @@ impl Config {
         let mut file_extension = "rs".to_string();
         let mut foreground_color = None;
         let mut background_color = None;
+        let mut min_accuracy = None;
+        let mut skip_word_on_space = false;
 
         let mut argc = 0;
         let mut strict = false;
@@ -40,8 +45,14 @@ impl Config {
                         file_extension.remove(0);
                     }
                 }
+                "-ma" => {
+                    min_accuracy = args
+                        .next()
+                        .and_then(|s| s.parse::<f32>().ok())
+                }
                 "-v" => return Err(Error::Version),
                 "-s" => strict = true,
+                "-ss" => skip_word_on_space = true,
                 "-cf" => {
                     let front_color = args.next().unwrap_or("green".to_string());
                     if let Ok(c) = front_color.parse::<u8>() {
@@ -93,6 +104,8 @@ impl Config {
             strict,
             cursor_foreground_color: foreground_color.unwrap_or(Color::Green),
             cursor_background_color: background_color.unwrap_or(Color::DarkGrey),
+            min_accuracy,
+            skip_word_on_space,
         };
 
         Ok(inst)

@@ -115,7 +115,7 @@ fn render<T: RenderTarget>(
             // Split the text if the text is too long to fit on one line,
             // and show the results as multiple lines.
             let text_chunks: Vec<String> = {
-                let result_text = format!(
+                let mut result_text = format!(
                     "time: {} seconds | wpm: {} (cpm: {}) | mistakes: {} | accuracy: {:.2}% | word count: {}",
                     elapsed.as_secs(),
                     wpm,
@@ -125,10 +125,21 @@ fn render<T: RenderTarget>(
                     word_count
                 );
 
-                // If the result text can't fit on screen we split it on 
+                // If the accuracy is given, and achieved accuracy
+                // is less than the target, don't show the results.
+                match config.min_accuracy {
+                    Some(acc) if accuracy < acc => result_text =format!("Accuracy too low ({:.2}%)", accuracy),
+                    _ => {}
+                }
+
+                // If the result text can't fit on screen we split it on
                 // the pipe char.
                 let mut chunks = if result_text.chars().count() as u16 > viewport.size.width {
-                    result_text.split('|').map(str::trim).map(String::from).collect()
+                    result_text
+                        .split('|')
+                        .map(str::trim)
+                        .map(String::from)
+                        .collect()
                 } else {
                     vec![result_text]
                 };
@@ -176,7 +187,7 @@ fn play() -> error::Result<()> {
     let (w, h) = term_size().expect("could not get terminal size");
     let mut selected_words = words(&config, (w * h) as usize)?;
 
-    let mut game = Game::new(&selected_words, config.strict);
+    let mut game = Game::new(&selected_words, config.strict, config.skip_word_on_space);
 
     let mut viewport = Viewport::new(ScreenPos::zero(), ScreenSize::new(w, h));
 
@@ -207,9 +218,9 @@ fn play() -> error::Result<()> {
                 GameState::Finished { .. } => match c {
                     'y' => {
                         selected_words = words(&config, (w * h) as usize)?;
-                        game = Game::new(&selected_words, config.strict);
+                        game = Game::new(&selected_words, config.strict, config.skip_word_on_space);
                     }
-                    'r' => game = Game::new(&selected_words, config.strict),
+                    'r' => game = Game::new(&selected_words, config.strict, config.skip_word_on_space),
                     'n' => break,
                     _ => {}
                 },

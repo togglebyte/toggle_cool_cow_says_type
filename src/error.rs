@@ -25,7 +25,9 @@ impl Error {
             Error::NeedsHelp => "Usage: tccst -t rs -w 5 path_to_project
     -t : extension of files to use for words. Defaults to rs for Rust.
     -w : number of words to type against. Defaults to 10.
-    -s : strict mode. Input must be matched perfectly, otherwise game can't end! Space will not skip the entire word".into(),
+    -ma: minimum accuracy required to see the actual result.
+    -s : strict mode. Input must be matched perfectly, otherwise game can't end! Space will not skip the entire word
+    -ss: skip word on space, unless it's the first character.".into(),
         }
     }
 }

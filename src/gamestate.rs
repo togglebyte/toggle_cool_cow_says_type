@@ -22,10 +22,11 @@ pub struct Game {
     mistakes: usize,
     word_count: usize,
     strict: bool,
+    skip_word_on_space: bool,
 }
 
 impl Game {
-    pub fn new(words: &[String], strict: bool) -> Self {
+    pub fn new(words: &[String], strict: bool, skip_word_on_space: bool) -> Self {
         let word_count = words.len();
         let text = words.join(" ");
         let text_chars = text.chars().collect::<Vec<_>>();
@@ -38,6 +39,7 @@ impl Game {
             mistakes: 0,
             state: GameState::Stopped,
             strict,
+            skip_word_on_space,
         }
     }
 
@@ -70,15 +72,15 @@ impl Game {
         let current_index = self.input.len();
         let next_index = current_index + 1;
 
-        // In strict mode: Skip the entire word if space was pressed anywhere
+        // If skip_word_on_space: Skip the entire word if space was pressed anywhere
         // but on the first character of the word, or as the absolute
         // first input.
-        match (self.strict, c, self.text.chars().skip(current_index).next()) {
-            (true, ..) => {}
+        match (self.skip_word_on_space, c, self.text.chars().skip(current_index).next()) {
+            (false, ..) => {}
             // If space is pressed and current char is not a space,
             // and there is some player input, we advance the cursor
             // to the next word and count skipped chars as mistakes.
-            (false, ' ', Some(current)) if current != ' ' && current_index > 0 => {
+            (true, ' ', Some(current)) if current != ' ' && current_index > 0 => {
                 // Don't advance if the cursor is at the beginning of a word
                 match self.text.chars().skip(current_index - 1).next() {
                     None | Some(' ') => return,
@@ -102,7 +104,7 @@ impl Game {
 
                 return;
             }
-            (false, ' ', Some(nc)) if nc != ' ' => return,
+            (true, ' ', Some(nc)) if nc != ' ' => return,
             _ => (),
         };
 
