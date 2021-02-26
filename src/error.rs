@@ -27,7 +27,10 @@ impl Error {
     -w : number of words to type against. Defaults to 10.
     -ma: minimum accuracy required to see the actual result.
     -s : strict mode. Input must be matched perfectly, otherwise game can't end! Space will not skip the entire word
-    -ss: skip word on space, unless it's the first character.".into(),
+    -ss: skip word on space, unless it's the first character.
+    -cf: set cursor foreground colour.
+    -cb: set cursor background colour.
+    -v: version info.".into(),
         }
     }
 }
