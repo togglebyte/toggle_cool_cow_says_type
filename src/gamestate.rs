@@ -37,7 +37,7 @@ impl Game {
             text,
             text_chars,
             mistakes: 0,
-            state: GameState::Stopped,
+            state: GameState::Running(Instant::now()),
             strict,
             skip_word_on_space,
         }
