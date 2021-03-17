@@ -1,6 +1,6 @@
 [package]
 name = "tccst"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["Togglebit <me@togglebit.io>", "_Bare <bare@logixsr.com>", "hardliner66 <hardliner66@gmail.com>"]
 edition = "2018"
 
@@ -11,3 +11,4 @@ rand = "0.8.3"
 tinybit = { git = "https://github.com/togglebyte/tinybit" }
 walkdir = "2.3.1"
 shellexpand = "2.1.0"
+ignore = "0.4.17"

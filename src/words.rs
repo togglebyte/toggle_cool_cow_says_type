@@ -2,7 +2,8 @@ use std::fs::read_to_string;
 use std::path::PathBuf;
 
 use rand::prelude::*;
-use walkdir::WalkDir;
+// use walkdir::WalkDir;
+use ignore::WalkBuilder;
 
 use crate::config::Config;
 use crate::error::{Error, Result};
@@ -10,13 +11,13 @@ use crate::error::{Error, Result};
 fn find_files(path: PathBuf, required_ext: &str) -> Vec<PathBuf> {
     let mut paths = Vec::new();
 
-    for entry in WalkDir::new(path) {
+    for entry in WalkBuilder::new(path).git_ignore(true).build() {
         let entry = match entry {
             Ok(e) => e,
             Err(_) => continue,
         };
 
-        if !entry.file_type().is_file() {
+        if !entry.file_type().unwrap().is_file() {
             continue;
         }
 

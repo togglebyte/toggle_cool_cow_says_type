@@ -219,6 +219,7 @@ fn play() -> error::Result<()> {
                     'y' => {
                         selected_words = words(&config, (w * h) as usize)?;
                         game = Game::new(&selected_words, config.strict, config.skip_word_on_space);
+                        game.start();
                     }
                     'r' => game = Game::new(&selected_words, config.strict, config.skip_word_on_space),
                     'n' => break,
