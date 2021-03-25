@@ -102,8 +102,8 @@ impl Config {
             project_path: project_path.into(),
             file_extension,
             strict,
-            cursor_foreground_color: foreground_color.unwrap_or(Color::Green),
-            cursor_background_color: background_color.unwrap_or(Color::DarkGrey),
+            cursor_foreground_color: foreground_color.unwrap_or(Color::Black),
+            cursor_background_color: background_color.unwrap_or(Color::Blue),
             min_accuracy,
             skip_word_on_space,
         };
