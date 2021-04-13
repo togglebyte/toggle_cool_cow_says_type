@@ -1,14 +1,18 @@
 [package]
 name = "tccst"
 version = "0.1.8"
-authors = ["Togglebit <me@togglebit.io>", "_Bare <bare@logixsr.com>", "hardliner66 <hardliner66@gmail.com>"]
+authors = [
+    "Togglebit <me@togglebit.io>", 
+    "_Bare <bare@logixsr.com>", 
+    "hardliner66 <hardliner66@gmail.com>"
+]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 rand = "0.8.3"
-tinybit = { git = "https://github.com/togglebyte/tinybit" }
+tinybit = "0.1.1"
 walkdir = "2.3.1"
 shellexpand = "2.1.0"
 ignore = "0.4.17"
