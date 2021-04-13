@@ -4,7 +4,8 @@ version = "0.1.9"
 authors = [
     "Togglebit <me@togglebit.io>", 
     "_Bare <bare@logixsr.com>", 
-    "hardliner66 <hardliner66@gmail.com>"
+    "hardliner66 <hardliner66@gmail.com>",
+    "cafce25 <cafce25@gmail.com>"
 ]
 edition = "2018"
 
