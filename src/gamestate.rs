@@ -68,6 +68,7 @@ impl Game {
     pub fn push(&mut self, c: char) {
         if self.input.len() == 0 {
             self.state = GameState::Running(Instant::now());
+            self.mistakes = 0;
         }
         let current_index = self.input.len();
         let next_index = current_index + 1;

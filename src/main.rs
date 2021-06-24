@@ -148,7 +148,7 @@ fn render<T: RenderTarget>(
                 // and the try-again text.
                 chunks.push(String::from(" "));
 
-                let text = "Try again? Y(es) | N(no) | R(etry same words)".to_string();
+                let text = "Try again? Y(es) | N(o) | R(etry same words)".to_string();
 
                 // Same as for the result text: we split it on the pipe
                 // if it can't fit.

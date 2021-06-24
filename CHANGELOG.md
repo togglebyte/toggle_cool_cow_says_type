@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0
+
+### Changed
+* Clearing all characters also resets mistakes.
+* Fixed typo: N(no) is now N(o)
+
 ## 0.1.9
 
 ### Changed 

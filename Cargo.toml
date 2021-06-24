@@ -1,6 +1,6 @@
 [package]
 name = "tccst"
-version = "0.1.9"
+version = "1.0.0"
 authors = [
     "Togglebit <me@togglebit.io>", 
     "_Bare <bare@logixsr.com>", 
